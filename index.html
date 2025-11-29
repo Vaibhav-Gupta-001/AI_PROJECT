@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recommendation System</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind for a modern, dark theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-bg': '#0f172a', /* Slate 900 */
+                        'card-bg': '#1e293b',    /* Slate 800 */
+                        'accent': '#6366f1',     /* Indigo 500 (Primary/Specific Match) */
+                        'accent-hover': '#4f46e5', /* Indigo 600 */
+                        'text-light': '#f8fafc', /* Slate 50 */
+                        'text-muted': '#94a3b8', /* Slate 400 */
+                        'secondary-accent': '#14b8a6', /* Teal 500 (Secondary/Fallback Match) */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 25px rgba(99, 102, 241, 0.7)', /* Stronger glow */
+                        'glow-sm': '0 0 10px rgba(99, 102, 241, 0.5)',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: 0, transform: 'translateY(10px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' },
+                        },
+                        pulseBorder: {
+                            '0%, 100%': { borderColor: 'rgba(99, 102, 241, 0.5)' },
+                            '50%': { borderColor: 'rgba(99, 102, 241, 1)' },
+                        }
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.5s ease-out',
+                        pulseBorder: 'pulseBorder 4s infinite ease-in-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        /* Smooth scroll for navigation */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Ensures the body can scroll naturally */
+        body {
+            overflow-y: auto; 
+        }
+
+        /* Futuristic Animated Grid Background */
+        .cyber-grid {
+            position: relative;
+            z-index: 0;
+            /* Removed overflow: hidden; to allow page scrolling */
+        }
+
+        .cyber-grid::before {
+            content: '';
+            position: fixed; /* Fixed position ensures the grid covers the whole viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+            animation: gridFlow 30s infinite linear;
+        }
+        
+        @keyframes gridFlow {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                background-position: 50px 50px;
+            }
+        }
+        
+        /* Result card highlight animation */
+        .result-card-pulse {
+            animation: fadeIn 0.5s ease-out, pulseBorder 4s infinite;
+        }
+        
+        /* Highlight focus text */
+        .highlight-text {
+            color: #14b8a6; /* Secondary Accent */
+            text-shadow: 0 0 5px rgba(20, 184, 166, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-primary-bg text-text-light font-sans min-h-screen flex flex-col cyber-grid">
+
+    <!-- Header and Navigation -->
+    <header class="sticky top-0 bg-primary-bg/90 backdrop-blur-md z-20 shadow-xl border-b border-slate-700/50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-accent tracking-wider">EXPERT<span class="text-secondary-accent">SYSTEM</span></h1>
+            <nav class="space-x-4 md:space-x-8">
+                <a href="#home" class="text-text-light hover:text-secondary-accent transition duration-300">Home</a>
+                <a href="#recommendation" class="text-text-light hover:text-secondary-accent transition duration-300">Run System</a>
+                <a href="#about" class="text-text-light hover:text-secondary-accent transition duration-300">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow z-10">
+        <!-- Home Section -->
+        <section id="home" class="container mx-auto px-4 py-20 text-center flex flex-col items-center justify-center min-h-[80vh]">
+            <div class="max-w-4xl">
+                <h2 class="text-5xl md:text-8xl font-black mb-6 leading-tight uppercase tracking-tighter" style="text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);">
+                    <span class="text-accent">AI</span>-Powered <span class="text-secondary-accent">MATCH</span>
+                </h2>
+                <p class="text-xl text-text-muted mb-10 max-w-2xl mx-auto">
+                    Engage with our Expert System to find precise, rule-based recommendations tailored to your domain, budget, and focus activity.
+                </p>
+                <a href="#recommendation" class="bg-accent hover:bg-accent-hover text-white font-semibold py-4 px-10 rounded-full shadow-glow transition duration-300 ease-in-out transform hover:scale-105 border-2 border-accent">
+                    Initiate Recommendation Protocol
+                </a>
+            </div>
+            <!-- Image illustrating AI/Recommendation -->
+            <div class="mt-20">
+                <!-- Enhanced SVG Icon representing Data Flow/AI -->
+                <svg class="w-28 h-28 text-secondary-accent animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3v18M12 3a9 9 0 0 0 9 9M12 3a9 9 0 0 1 9 9m-9 9a9 9 0 0 1 9-9m-9 9a9 9 0 0 0-9-9m11.9 4.3a6 6 0 0 0-11.8 0M17.4 9.7a6 6 0 0 0-10.8 0"></path>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Recommendation Form Section -->
+        <section id="recommendation" class="container mx-auto px-4 py-16">
+            <h2 class="text-4xl font-bold text-center mb-12 border-b-2 border-secondary-accent/50 pb-4 max-w-2xl mx-auto">Input Parameters</h2>
+            
+            <div class="max-w-4xl mx-auto bg-card-bg p-8 md:p-12 rounded-2xl shadow-xl border border-accent/30 hover:shadow-glow-sm transition duration-500">
+                <form id="recommendationForm" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Dropdown 1: Domain/Category -->
+                    <div class="space-y-2">
+                        <label for="domain" class="block text-secondary-accent text-lg font-bold tracking-wide">1. Core Domain</label>
+                        <select id="domain" name="domain" required class="w-full p-4 bg-primary-bg border-2 border-slate-600 rounded-xl text-text-light focus:ring-secondary-accent focus:border-secondary-accent appearance-none transition duration-150 shadow-inner">
+                            <option value="" disabled selected>-- Select Category --</option>
+                            <option value="electronics">Electronics (Gadgets)</option>
+                            <option value="education">Education (Learning)</option>
+                            <option value="health">Health (Fitness/Wellness)</option>
+                            <option value="finance">Finance (Money/Investment)</option>
+                            <option value="travel">Travel (Exploration)</option>
+                            <option value="creative">Creative (Art/Design)</option>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown 2: Importance/Budget -->
+                    <div class="space-y-2">
+                        <label for="importance" class="block text-secondary-accent text-lg font-bold tracking-wide">2. Priority / Budget</label>
+                        <select id="importance" name="importance" required class="w-full p-4 bg-primary-bg border-2 border-slate-600 rounded-xl text-text-light focus:ring-secondary-accent focus:border-secondary-accent appearance-none transition duration-150 shadow-inner">
+                            <option value="" disabled selected>-- Select Priority --</option>
+                            <option value="high">High (High Investment/Critical)</option>
+                            <option value="medium">Medium (Standard/Balance)</option>
+                            <option value="low">Low (Casual/Entry Level)</option>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown 3: Focus/Activity Keyword -->
+                    <div class="space-y-2">
+                        <label for="focus" class="block text-secondary-accent text-lg font-bold tracking-wide">3. Activity Focus</label>
+                        <select id="focus" name="focus" required class="w-full p-4 bg-primary-bg border-2 border-slate-600 rounded-xl text-text-light focus:ring-secondary-accent focus:border-secondary-accent appearance-none transition duration-150 shadow-inner">
+                            <option value="" disabled selected>-- Specify Style --</option>
+                            <option value="gaming">Gaming</option>
+                            <option value="learning">Self-Improvement (Personal Growth)</option>
+                            <option value="fitness">Fitness Training</option>
+                            <option value="reading">Reading/Knowledge</option>
+                            <option value="running">Running/Endurance</option>
+                            <option value="music">Music/Composition</option>
+                            <option value="investment">Financial Investment</option>
+                            <option value="adventure">Outdoor Adventure</option>
+                            <option value="photography">Visual Photography</option>
+                            <option value="art">Digital/Traditional Art</option>
+                            <option value="culture">Language/Culture</option>
+                            <option value="general">General/Everyday Use</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="md:col-span-3 pt-6">
+                        <button type="submit" id="submitButton" class="w-full bg-secondary-accent hover:bg-teal-600 text-primary-bg font-extrabold py-4 px-4 rounded-xl shadow-lg shadow-secondary-accent/50 transition duration-300 transform hover:scale-[1.01] flex items-center justify-center uppercase tracking-wider text-xl">
+                            <!-- Custom Loading Spinner SVG for futuristic feel -->
+                            <svg id="submitIcon" class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span id="submitText">ANALYZE & GENERATE RECOMMENDATION</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Recommendation Output Area (More visually distinct) -->
+                <div id="resultOutput" class="mt-12 p-8 bg-slate-800 rounded-2xl border-2 border-accent/50 shadow-glow hidden result-card-pulse animate-fadeIn">
+                    <h3 class="text-2xl font-black mb-4 text-accent uppercase flex items-center">
+                        <svg class="w-7 h-7 mr-3 text-secondary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.275a1.8 1.8 0 010 2.55L14.45 12 18.5 16.05a1.8 1.8 0 01-2.55 2.55L12 14.55l-4.05 4.05a1.8 1.8 0 01-2.55-2.55L9.55 12 5.5 7.95a1.8 1.8 0 012.55-2.55L12 9.45l4.05-4.05a1.8 1.8 0 012.55 0z"></path></svg>
+                        RESULT FOUND
+                    </h3>
+                    
+                    <!-- Display User Preferences for Interactivity -->
+                    <p class="text-text-muted text-md mb-6 border-b border-slate-700 pb-4">
+                        System analysis based on: 
+                        <span class="highlight-text font-bold uppercase tracking-wider" id="outDomain"></span> Domain, 
+                        <span class="highlight-text font-bold uppercase tracking-wider" id="outImportance"></span> Priority, and 
+                        <span class="highlight-text font-bold uppercase tracking-wider" id="outFocus"></span> Focus.
+                    </p>
+
+                    <div class="flex items-center space-x-4">
+                        <div id="recommendationIcon" class="w-12 h-12 text-accent flex-shrink-0">
+                            <!-- Icon will be inserted here -->
+                        </div>
+                        <div>
+                            <p class="text-text-light text-xl">The Expert System Recommends:</p>
+                            <p id="recommendationText" class="text-4xl md:text-5xl font-extrabold text-accent mt-1 break-words" style="text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);">
+                                <!-- Recommendation text will be inserted here -->
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Error/Loading Message Box -->
+                <div id="messageBox" class="mt-4 p-4 rounded-lg hidden" role="alert">
+                    <p id="messageText" class="font-medium"></p>
+                </div>
+
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section id="about" class="container mx-auto px-4 py-16 border-t border-slate-800">
+            <h2 class="text-4xl font-bold text-center mb-10">System Architecture Overview</h2>
+            <div class="max-w-4xl mx-auto text-lg space-y-6 text-text-muted">
+                <p>
+                    This application operates on a <span class="text-accent font-semibold">Forward-Chaining Inference Engine</span>, meaning it starts with the user's data (the preferences) and works forward to a conclusion (the recommendation).
+                </p>
+                <ul class="list-disc list-inside space-y-2 pl-4">
+                    <li><span class="font-semibold text-secondary-accent">Backend Logic:</span> Python (Flask) hosts the core **knowledge base**—a collection of explicit rules (`rules` list) that define product criteria.</li>
+                    <li><span class="font-semibold text-secondary-accent">Inference Mechanism:</span> The `recommend()` function checks if a rule's conditions are a **subset** of the user's three input parameters.</li>
+                    <li><span class="font-semibold text-secondary-accent">Robustness:</span> The system is designed with multiple **fallback rules** to ensure a meaningful recommendation is provided, even if highly specific criteria are not met.</li>
+                </ul>
+                <p>
+                    The modern frontend is built with HTML, JavaScript, and styled using Tailwind CSS, ensuring a fast, responsive, and aesthetically pleasing user experience that reflects the project's AI theme.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-card-bg mt-12 py-6 text-center text-text-muted text-sm border-t border-slate-800">
+        <p>&copy; 2024 ExpertRec. Expert System for Product/Service Recommendation.</p>
+    </footer>
+
+    <!-- Inline JavaScript for Frontend Logic -->
+    <script>
+        const form = document.getElementById('recommendationForm');
+        const submitButton = document.getElementById('submitButton');
+        const submitText = document.getElementById('submitText');
+        const submitIcon = document.getElementById('submitIcon');
+        const resultOutput = document.getElementById('resultOutput');
+        const recommendationText = document.getElementById('recommendationText');
+        const recommendationIcon = document.getElementById('recommendationIcon'); 
+        const outDomain = document.getElementById('outDomain');
+        const outImportance = document.getElementById('outImportance');
+        const outFocus = document.getElementById('outFocus');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        
+        // Define the minimum time the loading indicator must be visible (2000ms = 2 seconds)
+        const MIN_LOADING_TIME = 2000;
+
+        // --- ICON MAPPING (using inline SVGs for compatibility) ---
+        const iconMap = {
+            electronics: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>', // Laptop
+            education: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20h-7.5"/><path d="M10 2v20"/></svg>', // Book Open
+            health: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M18 13V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v7"/><path d="M5 22h14"/><path d="M12 7v8"/><path d="M8 15h8"/></svg>', // Heart Pulse / Activity
+            finance: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>', // Wallet
+            travel: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M22 17H2L10 5l2 2 10 10z"/><path d="M12 17l10-10"/></svg>', // Compass / Map Pin
+            creative: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 6v6l4 2"/></svg>', // Lightbulb / Idea
+            general: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', // Shield (For generic/safety)
+        };
+
+        // Helper function to format dropdown value to Title Case for display
+        function formatPreference(value) {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
+        /**
+         * Cleans the recommendation text by removing internal indicators like "(Fallback)" or "Generic ".
+         */
+        function cleanRecommendationText(text) {
+            if (!text) return "";
+            // Remove " (Fallback)" and "Generic " for clean display
+            let cleaned = text.replace(' (Fallback)', '').replace('Generic ', '');
+            return cleaned.trim();
+        }
+
+        // Function to show custom message
+        function showMessage(text, isError = false) {
+            messageText.textContent = text;
+            messageBox.classList.remove('hidden', 'bg-red-900/50', 'bg-green-900/50');
+            if (isError) {
+                // Use a softer warning color for user feedback
+                messageBox.classList.add('bg-orange-900/50', 'text-orange-300', 'border', 'border-orange-500');
+                messageBox.classList.remove('bg-red-900/50', 'text-red-300');
+            } else {
+                messageBox.classList.add('bg-green-900/50', 'text-green-300');
+                messageBox.classList.remove('bg-orange-900/50', 'text-orange-300', 'border', 'border-orange-500');
+            }
+        }
+
+        // Function to hide the message box
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+        }
+        
+        // Function to handle form submission
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            hideMessage();
+            resultOutput.classList.add('hidden', 'opacity-0');
+
+            const domain = document.getElementById('domain').value;
+            const importance = document.getElementById('importance').value;
+            const focus = document.getElementById('focus').value;
+
+            // Simple validation
+            if (!domain || !importance || !focus) {
+                showMessage("Alert: Please ensure all three input parameters are selected.", true);
+                return;
+            }
+
+            // --- Start Loading State ---
+            const data = { domain, importance, focus };
+            
+            submitText.textContent = "ANALYZING DATA...";
+            submitButton.disabled = true;
+            submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+            
+            // Custom Loading Icon HTML & Spinner
+            submitIcon.classList.add('animate-spin');
+            submitIcon.innerHTML = `<svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4V2M12 22V20M4 12H2M22 12H20M5.63604 5.63604L4.22183 4.22183M19.7782 19.7782L18.364 18.364M19.7782 4.22183L18.364 5.63604M4.22183 19.7782L5.63604 18.364" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>`;
+            // --- End Loading State Setup ---
+
+            try {
+                // 1. Setup Fetch and Minimum Delay Promises
+                const fetchPromise = fetch('/api/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                // 2. Setup minimum delay promise (2 seconds)
+                const delayPromise = new Promise(resolve => setTimeout(resolve, MIN_LOADING_TIME));
+
+                // 3. Wait for BOTH the API response AND the minimum delay to complete
+                const [response] = await Promise.all([fetchPromise, delayPromise]);
+
+                // 4. Process the response after the delay
+                const result = await response.json();
+
+                // Display the user's choices immediately for interactive feel
+                outDomain.textContent = formatPreference(domain);
+                outImportance.textContent = formatPreference(importance);
+                outFocus.textContent = formatPreference(focus);
+                
+                if (response.ok && result.recommendation) {
+                    const recommendation = result.recommendation; // Original text from server
+                    const matchedDomain = result.domain || domain; 
+
+                    // Determine if it's a specific match or a fallback (check against original string)
+                    const isFallback = recommendation.includes("Fallback") || recommendation.includes("Generic");
+
+                    // Clean the text for user display
+                    const displayRecommendation = cleanRecommendationText(recommendation);
+                    recommendationText.textContent = displayRecommendation;
+
+                    // Set the icon based on the domain
+                    recommendationIcon.innerHTML = iconMap[matchedDomain] || iconMap.general;
+                    
+                    // Show result with animation classes
+                    resultOutput.classList.remove('hidden');
+                    void resultOutput.offsetWidth; // Force repaint
+                    resultOutput.classList.add('animate-fadeIn');
+                    resultOutput.classList.remove('opacity-0');
+                    
+                    // Apply styles based on the check performed on the original string
+                    if (isFallback) {
+                        // Use secondary color for fallback (Teal)
+                        recommendationText.classList.remove('text-accent', 'text-red-400');
+                        recommendationText.classList.add('text-secondary-accent');
+                        recommendationText.style.textShadow = '0 0 10px rgba(20, 184, 166, 0.5)';
+                        resultOutput.classList.remove('border-accent/50');
+                        resultOutput.classList.add('border-secondary-accent/50');
+                        recommendationIcon.classList.remove('text-accent', 'text-red-400');
+                        recommendationIcon.classList.add('text-secondary-accent');
+                    } else if (recommendation === "No matching product found") {
+                        // === UPDATED POLITE MESSAGE HANDLING ===
+                        recommendationText.textContent = "Try adjusting your choices for a better match.";
+                        recommendationText.classList.remove('text-accent', 'text-secondary-accent');
+                        recommendationText.classList.add('text-red-400');
+                        recommendationText.style.textShadow = 'none';
+                        
+                        // Use the polite message box for user guidance
+                        showMessage("Sorry! We couldn't find a specific product for this exact combination. Please try adjusting your selections!", true);
+                        
+                        resultOutput.classList.remove('border-accent/50', 'border-secondary-accent/50');
+                        resultOutput.classList.add('border-red-500/50');
+                        recommendationIcon.classList.remove('text-accent', 'text-secondary-accent');
+                        recommendationIcon.classList.add('text-red-400');
+                    } else {
+                         // Use primary accent color for specific match (Indigo)
+                         recommendationText.classList.remove('text-red-400', 'text-secondary-accent');
+                         recommendationText.classList.add('text-accent');
+                         recommendationText.style.textShadow = '0 0 10px rgba(99, 102, 241, 0.5)';
+                         resultOutput.classList.remove('border-secondary-accent/50');
+                         resultOutput.classList.add('border-accent/50');
+                         recommendationIcon.classList.remove('text-secondary-accent', 'text-red-400');
+                         recommendationIcon.classList.add('text-accent');
+                    }
+                    
+                    // Scroll to the result area
+                    resultOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                } else {
+                    showMessage(`System Error: ${result.error || 'Failed to get recommendation from server.'}`, true);
+                }
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showMessage('Network error or connection failed. Ensure the Flask server is running.', true);
+            } finally {
+                // --- Reset Loading State ---
+                submitText.textContent = "ANALYZE & GENERATE RECOMMENDATION";
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                // Change icon back to lightning bolt
+                submitIcon.classList.remove('animate-spin');
+                submitIcon.innerHTML = `<svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>`;
+                // --- End Loading State Reset ---
+            }
+        });
+
+    </script>
+</body>
+</html>
